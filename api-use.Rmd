@@ -1,0 +1,86 @@
+---
+title: "Accessing the Discourse API from R"
+---
+
+```{r}
+library(tidyverse)
+source('discourse.R')
+```
+
+## Overview
+
+This is a basic R client for the bits of the Discourse API we need to use at Plymouth.
+It mostly focusses on group membership right now.
+
+It should probably become a package at some point...
+
+
+## Make a connection object
+
+This mostly just encapsulates connection strings for making http requests:
+
+
+```{r}
+dc <- discourseconnection("https://discourse.psy.plymouth.ac.uk/",
+                          rstudioapi::askForPassword(prompt = "Enter your API Key Here:"),
+                          "system")
+
+print(dc$connection)
+```
+But it also stores some info about the instance:
+
+```{r}
+names(dc)
+```
+
+For example groups:
+
+```{r}
+dc$groups
+```
+
+
+
+## List groups and group members
+
+```{r}
+groups(dc)$name
+```
+
+
+```{r}
+agroup <- groups(dc)$name %>% first(1)
+group_members(dc, group_id=agroup)
+```
+
+
+## Amend groups
+
+```{r}
+add_group_members(dc, "test", usernames="bjw22")
+group_members(dc, group_id='test') %>% filter(username=="bjw22")
+```
+
+```{r}
+remove_group_members(dc, "test", usernames="bjw22")
+group_members(dc, group_id='test') %>% filter(username=="bjw22") 
+```
+
+
+
+# Todo
+
+- Upload avatars for students: https://docs.discourse.org/#tag/Uploads
+- Activity stats for non-engagers
+
+
+
+
+
+
+
+
+
+
+
+
